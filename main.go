@@ -8,13 +8,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
 type tableSpace struct {
 	DbName      string `json:"dbname"`
 	TsName      string `json:"tsname"`
-	GbFreeOfMax string `json:"gbfreeofmax"`
+	GbFreeOfMax int    `json:"gbfreeofmax"`
 	Date        string `json:"Date"`
 }
 
@@ -41,10 +42,11 @@ func parseCsvFile(file *os.File) []tableSpace {
 			continue
 		}
 
+		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
-			GbFreeOfMax: strings.TrimSpace(record[9]),
+			GbFreeOfMax: GbFreeOfMax,
 			Date:        strings.TrimSpace(record[0]),
 		})
 	}
@@ -91,10 +93,11 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 			continue
 		}
 
+		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
-			GbFreeOfMax: strings.TrimSpace(record[9]),
+			GbFreeOfMax: GbFreeOfMax,
 			Date:        strings.TrimSpace(record[0]),
 		})
 	}
@@ -214,6 +217,7 @@ func tableSpaceToJson(allTs []tableSpace) {
 		fmt.Printf("%#v \n", string(j))
 	}
 
+	// marshal all version
 	j, _ := json.Marshal(allTs)
 	fmt.Printf("%#v \n", string(j))
 }
@@ -273,5 +277,4 @@ func main() {
 	for db, _ := range dbList {
 		fmt.Printf("%#v \n", db)
 	}
-
 }

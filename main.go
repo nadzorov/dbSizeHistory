@@ -44,7 +44,7 @@ func parseCsvFile(file *os.File) []tableSpace {
 		}
 
 		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
-		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[4]))
+		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[3]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
@@ -97,7 +97,7 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 		}
 
 		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
-		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[4]))
+		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[3]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
@@ -267,6 +267,16 @@ func filterByDate(allTs []tableSpace, date string) []tableSpace {
 	return filteredTs
 }
 
+func getDbSize(allTs []tableSpace) int {
+	dbsize := 0
+	for _, ts := range allTs {
+		dbsize += ts.GbAlloc
+
+	}
+
+	return dbsize
+}
+
 func main() {
 
 	// testParseCsvFile()
@@ -275,6 +285,9 @@ func main() {
 
 	allTs = filterByDbName(allTs, "FS")
 	allTs = filterByDate(allTs, "2016-03-17")
+
+	dbsize := getDbSize(allTs)
+	fmt.Printf("%#v GB \n", dbsize)
 
 	tableSpaceToJson(allTs)
 

@@ -246,6 +246,18 @@ func filterByDbName(allTs []tableSpace, dbname string) []tableSpace {
 	return filteredTs
 }
 
+func filterByDate(allTs []tableSpace, date string) []tableSpace {
+	filteredTs := []tableSpace{}
+	for _, ts := range allTs {
+		if ts.Date == date {
+			filteredTs = append(filteredTs, ts)
+		}
+
+	}
+
+	return filteredTs
+}
+
 func main() {
 
 	// testParseCsvFile()
@@ -253,6 +265,7 @@ func main() {
 	allTs := parseCsvToTableSpace()
 
 	allTs = filterByDbName(allTs, "FS")
+	allTs = filterByDate(allTs, "2016-03-17")
 
 	tableSpaceToJson(allTs)
 

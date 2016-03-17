@@ -67,7 +67,16 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			// log.Fatal(err)
+
+			// possible line in files
+			// ERROR:
+			// ORA-00257: archiver error. Connect internal only, until freed.
+			// ERROR:
+			// ORA-28000: the account is locked
+			// print in error stream like: 2016/03/17 09:08:59 line 55, column 0: wrong number of fields in line
+			log.Println(err)
+			continue
 		}
 
 		// debug

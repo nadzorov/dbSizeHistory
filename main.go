@@ -234,11 +234,25 @@ func getDbList(allTs []tableSpace) map[string]int {
 	return dblist
 }
 
+func filterByDbName(allTs []tableSpace, dbname string) []tableSpace {
+	filteredTs := []tableSpace{}
+	for _, ts := range allTs {
+		if ts.DbName == dbname {
+			filteredTs = append(filteredTs, ts)
+		}
+
+	}
+
+	return filteredTs
+}
+
 func main() {
 
 	// testParseCsvFile()
 	// testFilepathWalk()
 	allTs := parseCsvToTableSpace()
+
+	allTs = filterByDbName(allTs, "FS")
 
 	tableSpaceToJson(allTs)
 

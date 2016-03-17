@@ -277,6 +277,18 @@ func getDbSize(allTs []tableSpace) int {
 	return dbsize
 }
 
+func printDbSizeForAll() {
+	fmt.Println("Start printDbSizeForAll()")
+	allTs := parseCsvToTableSpace()
+	for db, _ := range getDbList(allTs) {
+		tsDb := filterByDbName(allTs, db)
+		tsDbDate := filterByDate(tsDb, "2016-03-17")
+		dbsize := getDbSize(tsDbDate)
+		fmt.Printf("%#v %#v \n", db, dbsize)
+	}
+
+}
+
 func main() {
 
 	// testParseCsvFile()
@@ -295,4 +307,6 @@ func main() {
 	for db, _ := range dbList {
 		fmt.Printf("%#v \n", db)
 	}
+
+	printDbSizeForAll()
 }

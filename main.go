@@ -17,6 +17,7 @@ type tableSpace struct {
 	TsName      string `json:"tsname"`
 	GbFreeOfMax int    `json:"gbfreeofmax"`
 	Date        string `json:"Date"`
+	GbAlloc     int    `json:"gballoc"`
 }
 
 func parseCsvFile(file *os.File) []tableSpace {
@@ -43,11 +44,13 @@ func parseCsvFile(file *os.File) []tableSpace {
 		}
 
 		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
+		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[4]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
 			GbFreeOfMax: GbFreeOfMax,
 			Date:        strings.TrimSpace(record[0]),
+			GbAlloc:     GbAlloc,
 		})
 	}
 	return ts
@@ -94,11 +97,13 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 		}
 
 		GbFreeOfMax, _ := strconv.Atoi(strings.TrimSpace(record[9]))
+		GbAlloc, _ := strconv.Atoi(strings.TrimSpace(record[4]))
 		ts = append(ts, tableSpace{
 			DbName:      strings.TrimSpace(record[1]),
 			TsName:      strings.TrimSpace(record[2]),
 			GbFreeOfMax: GbFreeOfMax,
 			Date:        strings.TrimSpace(record[0]),
+			GbAlloc:     GbAlloc,
 		})
 	}
 	return ts

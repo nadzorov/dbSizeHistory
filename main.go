@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,10 +12,10 @@ import (
 )
 
 type tableSpace struct {
-	dbName      string
-	tsName      string
-	gbFreeOfMax string
-	date        string
+	DbName      string `json:"dbname"`
+	TsName      string `json:"tsname"`
+	GbFreeOfMax string `json:"gbfreeofmax"`
+	Date        string `json:"Date"`
 }
 
 func parseCsvFile(file *os.File) []tableSpace {
@@ -41,10 +42,10 @@ func parseCsvFile(file *os.File) []tableSpace {
 		}
 
 		ts = append(ts, tableSpace{
-			dbName:      strings.TrimSpace(record[1]),
-			tsName:      strings.TrimSpace(record[2]),
-			gbFreeOfMax: strings.TrimSpace(record[9]),
-			date:        strings.TrimSpace(record[0]),
+			DbName:      strings.TrimSpace(record[1]),
+			TsName:      strings.TrimSpace(record[2]),
+			GbFreeOfMax: strings.TrimSpace(record[9]),
+			Date:        strings.TrimSpace(record[0]),
 		})
 	}
 	return ts
@@ -91,10 +92,10 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 		}
 
 		ts = append(ts, tableSpace{
-			dbName:      strings.TrimSpace(record[1]),
-			tsName:      strings.TrimSpace(record[2]),
-			gbFreeOfMax: strings.TrimSpace(record[9]),
-			date:        strings.TrimSpace(record[0]),
+			DbName:      strings.TrimSpace(record[1]),
+			TsName:      strings.TrimSpace(record[2]),
+			GbFreeOfMax: strings.TrimSpace(record[9]),
+			Date:        strings.TrimSpace(record[0]),
 		})
 	}
 	return ts
@@ -147,12 +148,78 @@ func testFilepathWalk() {
 
 	for _, ts := range allTs {
 		fmt.Printf("%#v \n", ts)
+		// print only first line
+		// break
 	}
+}
+
+// parse all files in dir and return slice of tableSpace type
+func parseCsvToTableSpace() []tableSpace {
+	allTs := []tableSpace{}
+	filepath.Walk("./data", func(path string, fi os.FileInfo, err error) error {
+		// skip directories
+		if fi.IsDir() {
+			return nil
+		}
+
+		// TODO: skip all hidden files or read only *.log files
+		if path == "data/.DS_Store" {
+			return nil
+		}
+
+		// TODO: why contains "," in PCT_FREE_OF_MAX ?
+		if path == "data/INFORMER.log" {
+			return nil
+		}
+		// TODO: why contains "," in PCT_FREE_OF_MAX ?
+		if path == "data/SMSGATE.log" {
+			return nil
+		}
+
+		// debug
+		// fmt.Printf("%#v \n", path)
+
+		allTs = append(allTs, parseCsvFileWithOpen(path)...)
+		return nil
+
+	})
+
+	// debug
+	// for _, ts := range allTs {
+	// 	fmt.Printf("%#v \n", ts)
+	// 	// print only first line
+	// 	// break
+	// }
+
+	return allTs
+}
+
+// convert slice of tableSpace to json
+func tableSpaceToJson(allTs []tableSpace) {
+	for _, ts := range allTs {
+		// debug
+		// fmt.Printf("%#v \n", ts)
+
+		// encode version
+		// json.NewEncoder(os.Stdout).Encode(ts)
+
+		// debug
+		break
+
+		// marshal version
+		j, _ := json.Marshal(ts)
+		fmt.Printf("%#v \n", string(j))
+	}
+
+	j, _ := json.Marshal(allTs)
+	fmt.Printf("%#v \n", string(j))
 }
 
 func main() {
 
 	// testParseCsvFile()
-	testFilepathWalk()
+	// testFilepathWalk()
+	allTs := parseCsvToTableSpace()
+	tableSpaceToJson(allTs)
 
 }

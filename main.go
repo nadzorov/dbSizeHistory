@@ -200,8 +200,11 @@ func tableSpaceToJson(allTs []tableSpace) {
 		// debug
 		// fmt.Printf("%#v \n", ts)
 
-		// encode version
+		// encode version with write to stdout
 		// json.NewEncoder(os.Stdout).Encode(ts)
+
+		// encode version with write to string or array of strings
+		// ?
 
 		// debug
 		break
@@ -215,11 +218,33 @@ func tableSpaceToJson(allTs []tableSpace) {
 	fmt.Printf("%#v \n", string(j))
 }
 
+// get uniq database list
+func getDbList(allTs []tableSpace) map[string]int {
+	dblist := make(map[string]int)
+	for _, ts := range allTs {
+		dblist[ts.DbName] += 1
+
+		// debug
+		// break
+	}
+
+	// debug
+	// fmt.Printf("%#v \n", dblist)
+
+	return dblist
+}
+
 func main() {
 
 	// testParseCsvFile()
 	// testFilepathWalk()
 	allTs := parseCsvToTableSpace()
+
 	tableSpaceToJson(allTs)
+
+	dbList := getDbList(allTs)
+	for db, _ := range dbList {
+		fmt.Printf("%#v \n", db)
+	}
 
 }

@@ -350,10 +350,24 @@ func dbListJsonHandler(w http.ResponseWriter, r *http.Request) {
 
 func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 
+	vars := mux.Vars(r)
+	date := vars["date"]
+	dbname := vars["dbname"]
+	fmt.Printf("%#v \n", date)
+	// for parameter like ?date=...
+	// fmt.Printf("%#v \n", r.FormValue("date"))
+
 	w.Header().Set("Content-Type", "application/json")
 
 	allTs := parseCsvToTableSpace()
-	allTs = filterByDate(allTs, "2016-03-17")
+	if date != "" {
+		allTs = filterByDate(allTs, date)
+		// allTs = filterByDate(allTs, "2016-03-17")
+	}
+	if dbname != "" {
+		allTs = filterByDbName(allTs, dbname)
+		// allTs = filterByDate(allTs, "2016-03-17")
+	}
 
 	json.NewEncoder(w).Encode(allTs)
 }
@@ -386,7 +400,13 @@ func webServer() {
 	routes.HandleFunc("/dblist.json", dbListJsonHandler).Methods("GET")
 
 	routes.HandleFunc("/tslist", tsListHandler).Methods("GET")
-	routes.HandleFunc("/tslist.json", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/tslist/", tsListHandler).Methods("GET")
+	routes.HandleFunc("/tslist/dbname/{dbname}", tsListHandler).Methods("GET")
+	routes.HandleFunc("/tslist/date/{date}", tsListHandler).Methods("GET")
+	routes.HandleFunc("/api/tslist", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslist/", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslist/dbname/{dbname}", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslist/date/{date}", tsListJsonHandler).Methods("GET")
 
 	routes.HandleFunc("/chart", chartHandler).Methods("GET")
 	routes.HandleFunc("/chart.json", chartJsonHandler).Methods("GET")

@@ -379,17 +379,36 @@ func chartHandler(w http.ResponseWriter, r *http.Request) {
 
 func chartJsonHandler(w http.ResponseWriter, r *http.Request) {
 
-	chartLine := []int{}
+	vars := mux.Vars(r)
+	dbname := vars["dbname"]
+	tsname := vars["tsname"]
+
+	// chartLine := []int{}
+	// chartLine := make(map[string]int)
+	chartLabels := []string{}
+	chartValues := []int{}
 
 	allTs := parseCsvToTableSpace()
-	allTs = filterByDbName(allTs, "CFTWORK")
-	allTs = filterByTsName(allTs, "I_USR")
+	allTs = filterByDbName(allTs, dbname)
+	allTs = filterByTsName(allTs, tsname)
 
 	for _, ts := range allTs {
-		chartLine = append(chartLine, ts.GbAlloc)
+		// chartLine = append(chartLine, ts.GbAlloc)
+		// chartLine[ts.Date] = ts.GbAlloc
+		chartLabels = append(chartLabels, ts.Date)
+		chartValues = append(chartValues, ts.GbAlloc)
+
 	}
 
-	json.NewEncoder(w).Encode(chartLine)
+	type chart struct {
+		Labels []string `json:"labels"`
+		Values []int    `json:"values"`
+	}
+
+	// json.NewEncoder(w).Encode(chartLine)
+	// json.NewEncoder(w).Encode(chartLabels)
+	// json.NewEncoder(w).Encode(chartValues)
+	json.NewEncoder(w).Encode(chart{Labels: chartLabels, Values: chartValues})
 }
 
 func webServer() {
@@ -409,7 +428,7 @@ func webServer() {
 	routes.HandleFunc("/api/tslist/date/{date}", tsListJsonHandler).Methods("GET")
 
 	routes.HandleFunc("/chart", chartHandler).Methods("GET")
-	routes.HandleFunc("/chart.json", chartJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/chart/dbname/{dbname}/tsname/{tsname}", chartJsonHandler).Methods("GET")
 
 	fmt.Println("Start listening...")
 	http.ListenAndServe(":8080", routes)

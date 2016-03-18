@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+	<!-- https://datatables.net/examples/ajax/custom_data_flat.html -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+		    $('#tslist').DataTable( {
+		    	"paging": false,
+		    	"info": false,
+		        "ajax": {
+		            "url": "tslist.json",
+		            "dataSrc": ""
+		        },
+		        
+		        "columns": [
+		            { "data": "dbname" },
+		            { "data": "tsname" },
+		            { "data": "gballoc" },
+		            { "data": "gbfreeofmax" },
+		            { "data": "Date" }
+		            // { "data": "position" },
+		            // { "data": "office" },
+		            // { "data": "extn" },
+		            // { "data": "start_date" },
+		            // { "data": "salary" }
+		        ]
+		    } );
+		} );
+	</script>
+
+</HEAD>
+<BODY>
+	<table id="tslist" class="display compact" cellspacing="0" width="100%">
+	<!-- <table id="dblist" class="display compact" cellspacing="0" width="1%"> -->
+        <thead>
+            <tr>
+                <th>DB Name</th>
+                <th>TS Name</th>
+                <th>Allocated GB</th>
+                <th>Free of Max GB</th>
+                <th>Date</th>
+                <!-- <th>Position</th> -->
+                <!-- <th>Office</th> -->
+                <!-- <th>Extn.</th> -->
+                <!-- <th>Start date</th> -->
+                <!-- <th>Salary</th> -->
+            </tr>
+        </thead>
+    </table>
+</BODY>
+
+</HTML>

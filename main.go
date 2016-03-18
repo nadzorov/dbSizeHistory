@@ -4,8 +4,10 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -286,10 +288,84 @@ func printDbSizeForAll() {
 		dbsize := getDbSize(tsDbDate)
 		fmt.Printf("%#v %#v \n", db, dbsize)
 	}
+}
+
+func getDbSizeForAll() map[string]int {
+	fmt.Println("Start getDbSizeForAll()")
+	dbSizeMap := make(map[string]int)
+	allTs := parseCsvToTableSpace()
+	for db, _ := range getDbList(allTs) {
+		tsDb := filterByDbName(allTs, db)
+		tsDbDate := filterByDate(tsDb, "2016-03-17")
+		dbsize := getDbSize(tsDbDate)
+		fmt.Printf("%#v %#v \n", db, dbsize)
+		dbSizeMap[db] = dbsize
+	}
+
+	return dbSizeMap
+}
+
+func dbListHandler(w http.ResponseWriter, r *http.Request) {
+
+	http.ServeFile(w, r, "dblist.html")
+}
+
+func tsListHandler(w http.ResponseWriter, r *http.Request) {
+
+	http.ServeFile(w, r, "tslist.html")
+}
+
+func dbListJsonHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	type row struct {
+		DbName string `json:"dbname"`
+		DbSize int    `json:"dbsize"`
+	}
+
+	dbSizeMap := getDbSizeForAll()
+
+	tableRows := []row{}
+	for db, size := range dbSizeMap {
+		// fmt.Printf("%#v \n", db)
+		tableRows = append(tableRows, row{DbName: db, DbSize: size})
+	}
+
+	json.NewEncoder(w).Encode(tableRows)
 
 }
 
+func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	allTs := parseCsvToTableSpace()
+	allTs = filterByDate(allTs, "2016-03-17")
+
+	json.NewEncoder(w).Encode(allTs)
+
+}
+
+func webServer() {
+
+	routes := mux.NewRouter().StrictSlash(false)
+
+	routes.HandleFunc("/dblist", dbListHandler).Methods("GET")
+	routes.HandleFunc("/dblist.json", dbListJsonHandler).Methods("GET")
+
+	routes.HandleFunc("/tslist", tsListHandler).Methods("GET")
+	routes.HandleFunc("/tslist.json", tsListJsonHandler).Methods("GET")
+
+	fmt.Println("Start listening...")
+	http.ListenAndServe(":8080", routes)
+}
+
 func main() {
+
+	webServer()
+	// debug
+	fmt.Println("after webServer()")
 
 	// testParseCsvFile()
 	// testFilepathWalk()

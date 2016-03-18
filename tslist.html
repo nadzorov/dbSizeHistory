@@ -10,8 +10,12 @@
 		    $('#tslist').DataTable( {
 		    	"paging": false,
 		    	"info": false,
+		    	// disable initioal ordering
+		    	// "order": [],
 		        "ajax": {
 		            "url": "tslist.json",
+		            // same loading speed
+		            // "deferRender": true,
 		            "dataSrc": ""
 		        },
 		        

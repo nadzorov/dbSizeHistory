@@ -257,6 +257,18 @@ func filterByDbName(allTs []tableSpace, dbname string) []tableSpace {
 	return filteredTs
 }
 
+func filterByTsName(allTs []tableSpace, tsname string) []tableSpace {
+	filteredTs := []tableSpace{}
+	for _, ts := range allTs {
+		if ts.TsName == tsname {
+			filteredTs = append(filteredTs, ts)
+		}
+
+	}
+
+	return filteredTs
+}
+
 func filterByDate(allTs []tableSpace, date string) []tableSpace {
 	filteredTs := []tableSpace{}
 	for _, ts := range allTs {
@@ -344,7 +356,26 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	allTs = filterByDate(allTs, "2016-03-17")
 
 	json.NewEncoder(w).Encode(allTs)
+}
 
+func chartHandler(w http.ResponseWriter, r *http.Request) {
+	// fmt.Println("chart.html")
+	http.ServeFile(w, r, "chart.html")
+}
+
+func chartJsonHandler(w http.ResponseWriter, r *http.Request) {
+
+	chartLine := []int{}
+
+	allTs := parseCsvToTableSpace()
+	allTs = filterByDbName(allTs, "CFTWORK")
+	allTs = filterByTsName(allTs, "I_USR")
+
+	for _, ts := range allTs {
+		chartLine = append(chartLine, ts.GbAlloc)
+	}
+
+	json.NewEncoder(w).Encode(chartLine)
 }
 
 func webServer() {
@@ -356,6 +387,9 @@ func webServer() {
 
 	routes.HandleFunc("/tslist", tsListHandler).Methods("GET")
 	routes.HandleFunc("/tslist.json", tsListJsonHandler).Methods("GET")
+
+	routes.HandleFunc("/chart", chartHandler).Methods("GET")
+	routes.HandleFunc("/chart.json", chartJsonHandler).Methods("GET")
 
 	fmt.Println("Start listening...")
 	http.ListenAndServe(":8080", routes)

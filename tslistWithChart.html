@@ -9,6 +9,13 @@
 		tr.shown td.details-control {
 		    background: url('/img/details_close.png') no-repeat center center;
 		}
+
+		td.link:hover {
+			cursor: pointer;
+		}
+		td.link {
+			text-decoration: underline;
+		}
 	</style>
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
 	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
@@ -137,27 +144,13 @@
 
 		    // Add event listener for opening and closing details
 		    $('#showall').on('click', function () {
-		        $('#tslist tbody td.details-control').each( function() {
-			        var tr = $(this).closest('tr');
-			        var row = table.row( tr );
-			 
-			        if ( row.child.isShown() ) {
-			            // This row is already open - close it
-			            row.child.hide();
-			            tr.removeClass('shown');
-			        }
-			        else {
-			            // Open this row
-			            row.child( format(row.data()) ).show();
-			            tr.addClass('shown');
-			            var canvasName = "canvas" + row.data().dbname + row.data().tsname
-			            drawChart(canvasName, row.data().dbname, row.data().tsname);
-			        }
-			    });
-		    } );
+		    	
+		    	if ($(this).text() == "Show all") {
+		    		$(this).text("Hide all")
+		    	} else {
+		    		$(this).text("Show all")
+		    	}
 
-		    		    // Add event listener for opening and closing details
-		    $('#hideall').on('click', function () {
 		        $('#tslist tbody td.details-control').each( function() {
 			        var tr = $(this).closest('tr');
 			        var row = table.row( tr );
@@ -200,19 +193,19 @@
 
 </HEAD>
 <BODY>
-	<p id="showall">Show all</p>
-	<p id="hideall">Hide all</p>
+	<!-- <p id="showall">Show all</p> -->
+	<!-- <p id="hideall">Hide all</p> -->
 
 	<table border="0" cellspacing="5" cellpadding="5">
-        <tbody><tr>
-            <td>Minimum Free Of Max GB:</td>
-            <td><input type="text" id="min" name="min"></td>
-        </tr>
-        <tr>
-            <td>Maximum Free Of Max GB:</td>
-            <td><input type="text" id="max" name="max"></td>
-        </tr>
-    </tbody>
+        <tbody>
+	        <tr>
+	        	<td id="showall" class=link width="100px">Show all</td>
+	            <td>Minimum Free Of Max GB:</td>
+	            <td><input type="text" id="min" name="min"></td>
+	            <td>Maximum Free Of Max GB:</td>
+	            <td><input type="text" id="max" name="max"></td>
+	        </tr>
+    	</tbody>
 
 	<table id="tslist" class="display compact" cellspacing="0" width="100%">
 	<!-- <table id="dblist" class="display compact" cellspacing="0" width="1%"> -->

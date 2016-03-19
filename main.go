@@ -353,6 +353,7 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	date := vars["date"]
 	dbname := vars["dbname"]
+	isFreeOfMaxGbChanged := vars["isFreeOfMaxGbChanged"]
 	fmt.Printf("%#v \n", date)
 	// for parameter like ?date=...
 	// fmt.Printf("%#v \n", r.FormValue("date"))
@@ -360,6 +361,12 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	allTs := parseCsvToTableSpace()
+
+	//  TODO: How to copy allTs to allTsCont?
+	// allTsConst := []tableSpace{}
+	// copy(allTsConst, allTs)
+	allTsConst := parseCsvToTableSpace()
+
 	if date != "" {
 		allTs = filterByDate(allTs, date)
 		// allTs = filterByDate(allTs, "2016-03-17")
@@ -367,6 +374,31 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	if dbname != "" {
 		allTs = filterByDbName(allTs, dbname)
 		// allTs = filterByDate(allTs, "2016-03-17")
+	}
+
+	// check if Free Of Max GB changed over time
+	// isFreeOfMaxGbChanged=yes - show changed only
+	allTsChanged := []tableSpace{}
+	if isFreeOfMaxGbChanged == "yes" {
+
+		fmt.Printf("%#v \n", isFreeOfMaxGbChanged)
+
+		for _, ts := range allTs {
+			tsDbnameFiltered := filterByDbName(allTsConst, ts.DbName)
+			tsDbnameTsnameFiltered := filterByTsName(tsDbnameFiltered, ts.TsName)
+
+			isTsChangedMap := make(map[int]int)
+			for _, tsc := range tsDbnameTsnameFiltered {
+				isTsChangedMap[tsc.GbFreeOfMax] += 1
+			}
+
+			if len(isTsChangedMap) != 1 {
+				allTsChanged = append(allTsChanged, ts)
+			}
+		}
+
+		json.NewEncoder(w).Encode(allTsChanged)
+		return
 	}
 
 	json.NewEncoder(w).Encode(allTs)
@@ -427,6 +459,8 @@ func imgHandler(w http.ResponseWriter, r *http.Request) {
 
 func webServer() {
 
+	// http://127.0.0.1:8080/tslistWithChart/date/2016-03-17/isFreeOfMaxGbChanged/yes
+
 	routes := mux.NewRouter().StrictSlash(false)
 
 	routes.HandleFunc("/dblist", dbListHandler).Methods("GET")
@@ -449,11 +483,13 @@ func webServer() {
 	routes.HandleFunc("/tslistWithChart/", tsListWithChartHandler).Methods("GET")
 	routes.HandleFunc("/tslistWithChart/dbname/{dbame}", tsListWithChartHandler).Methods("GET")
 	routes.HandleFunc("/tslistWithChart/date/{date}", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/tslistWithChart/date/{date}/isFreeOfMaxGbChanged/{isFreeOfMaxGbChanged}", tsListWithChartHandler).Methods("GET")
 	routes.HandleFunc("/tslistWithChart/dbname/{dbame}/date/{date}", tsListWithChartHandler).Methods("GET")
 	routes.HandleFunc("/api/tslistWithChart", tsListJsonHandler).Methods("GET")
 	routes.HandleFunc("/api/tslistWithChart/", tsListJsonHandler).Methods("GET")
 	routes.HandleFunc("/api/tslistWithChart/dbname/{dbname}", tsListJsonHandler).Methods("GET")
 	routes.HandleFunc("/api/tslistWithChart/date/{date}", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart/date/{date}/isFreeOfMaxGbChanged/{isFreeOfMaxGbChanged}", tsListJsonHandler).Methods("GET")
 	routes.HandleFunc("/api/tslistWithChart/dbname/{dbname}/date/{date}", tsListJsonHandler).Methods("GET")
 
 	routes.HandleFunc("/img/{imgName}", imgHandler).Methods("GET")

@@ -18,6 +18,24 @@
 	<script type="text/javascript">
 		// https://datatables.net/examples/api/row_details.html
 
+		/* Custom filtering function which will search data in column four between two values */
+		$.fn.dataTable.ext.search.push(
+		    function( settings, data, dataIndex ) {
+		        var min = parseInt( $('#min').val(), 10 );
+		        var max = parseInt( $('#max').val(), 10 );
+		        var age = parseFloat( data[4] ) || 0; // use data for the age column
+		 	
+		        if ( ( isNaN( min ) && isNaN( max ) ) ||
+		             ( isNaN( min ) && age <= max ) ||
+		             ( min <= age   && isNaN( max ) ) ||
+		             ( min <= age   && age <= max ) )
+		        {
+		            return true;
+		        }
+		        return false;
+		    }
+		);
+
 		function drawChart(canvas, dbname, tsname) {
 				
 			var jsonData = $.ajax({
@@ -112,6 +130,11 @@
 		        ]
 		    } );
 
+		    // Event listener to the two range filtering inputs to redraw on input
+		    $('#min, #max').keyup( function() {
+		        table.draw();
+		    } );
+
 		    // Add event listener for opening and closing details
 		    $('#showall').on('click', function () {
 		        $('#tslist tbody td.details-control').each( function() {
@@ -179,6 +202,18 @@
 <BODY>
 	<p id="showall">Show all</p>
 	<p id="hideall">Hide all</p>
+
+	<table border="0" cellspacing="5" cellpadding="5">
+        <tbody><tr>
+            <td>Minimum Free Of Max GB:</td>
+            <td><input type="text" id="min" name="min"></td>
+        </tr>
+        <tr>
+            <td>Maximum Free Of Max GB:</td>
+            <td><input type="text" id="max" name="max"></td>
+        </tr>
+    </tbody>
+
 	<table id="tslist" class="display compact" cellspacing="0" width="100%">
 	<!-- <table id="dblist" class="display compact" cellspacing="0" width="1%"> -->
         <thead>

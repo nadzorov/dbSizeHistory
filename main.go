@@ -428,6 +428,7 @@ func webServer() {
 	routes.HandleFunc("/api/tslist/date/{date}", tsListJsonHandler).Methods("GET")
 
 	routes.HandleFunc("/chart", chartHandler).Methods("GET")
+	routes.HandleFunc("/chart/dbname/{dbname}/tsname/{tsname}", chartHandler).Methods("GET")
 	routes.HandleFunc("/api/chart/dbname/{dbname}/tsname/{tsname}", chartJsonHandler).Methods("GET")
 
 	fmt.Println("Start listening...")

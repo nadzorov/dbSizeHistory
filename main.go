@@ -83,7 +83,7 @@ func parseCsvFileWithOpen(fileName string) []tableSpace {
 			// ERROR:
 			// ORA-28000: the account is locked
 			// print in error stream like: 2016/03/17 09:08:59 line 55, column 0: wrong number of fields in line
-			log.Println(err)
+			log.Println(err, "Filename: ", file.Name())
 			continue
 		}
 
@@ -178,13 +178,15 @@ func parseCsvToTableSpace() []tableSpace {
 		}
 
 		// TODO: why contains "," in PCT_FREE_OF_MAX ?
-		if path == "data/INFORMER.log" {
-			return nil
-		}
+		// add export NLS_LANG='AMERICAN_AMERICA.UTF8'
+		// if path == "data/INFORMER.log" {
+		// 	return nil
+		// }
 		// TODO: why contains "," in PCT_FREE_OF_MAX ?
-		if path == "data/SMSGATE.log" {
-			return nil
-		}
+		// add export NLS_LANG='AMERICAN_AMERICA.UTF8'
+		// if path == "data/SMSGATE.log" {
+		// 	return nil
+		// }
 
 		// debug
 		// fmt.Printf("%#v \n", path)
@@ -354,7 +356,8 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	date := vars["date"]
 	dbname := vars["dbname"]
 	isFreeOfMaxGbChanged := vars["isFreeOfMaxGbChanged"]
-	fmt.Printf("%#v \n", date)
+
+	// fmt.Printf("%#v \n", date)
 	// for parameter like ?date=...
 	// fmt.Printf("%#v \n", r.FormValue("date"))
 
@@ -381,7 +384,7 @@ func tsListJsonHandler(w http.ResponseWriter, r *http.Request) {
 	allTsChanged := []tableSpace{}
 	if isFreeOfMaxGbChanged == "yes" {
 
-		fmt.Printf("%#v \n", isFreeOfMaxGbChanged)
+		// fmt.Printf("%#v \n", isFreeOfMaxGbChanged)
 
 		for _, ts := range allTs {
 			tsDbnameFiltered := filterByDbName(allTsConst, ts.DbName)

@@ -396,7 +396,8 @@ func chartJsonHandler(w http.ResponseWriter, r *http.Request) {
 		// chartLine = append(chartLine, ts.GbAlloc)
 		// chartLine[ts.Date] = ts.GbAlloc
 		chartLabels = append(chartLabels, ts.Date)
-		chartValues = append(chartValues, ts.GbAlloc)
+		// chartValues = append(chartValues, ts.GbAlloc)
+		chartValues = append(chartValues, ts.GbFreeOfMax)
 
 	}
 
@@ -409,6 +410,19 @@ func chartJsonHandler(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(chartLabels)
 	// json.NewEncoder(w).Encode(chartValues)
 	json.NewEncoder(w).Encode(chart{Labels: chartLabels, Values: chartValues})
+}
+
+func tsListWithChartHandler(w http.ResponseWriter, r *http.Request) {
+
+	http.ServeFile(w, r, "tslistWithChart.html")
+}
+
+func imgHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	imgName := vars["imgName"]
+
+	http.ServeFile(w, r, "img/"+imgName)
 }
 
 func webServer() {
@@ -430,6 +444,19 @@ func webServer() {
 	routes.HandleFunc("/chart", chartHandler).Methods("GET")
 	routes.HandleFunc("/chart/dbname/{dbname}/tsname/{tsname}", chartHandler).Methods("GET")
 	routes.HandleFunc("/api/chart/dbname/{dbname}/tsname/{tsname}", chartJsonHandler).Methods("GET")
+
+	routes.HandleFunc("/tslistWithChart", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/tslistWithChart/", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/tslistWithChart/dbname/{dbame}", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/tslistWithChart/date/{date}", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/tslistWithChart/dbname/{dbame}/date/{date}", tsListWithChartHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart/", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart/dbname/{dbname}", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart/date/{date}", tsListJsonHandler).Methods("GET")
+	routes.HandleFunc("/api/tslistWithChart/dbname/{dbname}/date/{date}", tsListJsonHandler).Methods("GET")
+
+	routes.HandleFunc("/img/{imgName}", imgHandler).Methods("GET")
 
 	fmt.Println("Start listening...")
 	http.ListenAndServe(":8080", routes)

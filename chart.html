@@ -7,9 +7,13 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
 	</head>
 	<body>
-		<div style="width:50%">
+		<!-- <div style="width:30%"> -->
+		<!-- <div style="width:70%"> -->
+		<div style="width:100%">
 			<div>
-				<canvas id="canvas" height="450" width="600"></canvas>
+				<!-- <canvas id="canvas" height="450" width="600"></canvas> -->
+				<canvas id="canvas" height="100" width="1000"></canvas>
+				<!-- <canvas id="canvas"></canvas> -->
 			</div>
 		</div>
 
@@ -17,7 +21,7 @@
 	<script>
 		// http://microbuilder.io/blog/2016/01/10/plotting-json-data-with-chart-js.html
 
-		var data = [];
+		// var data = [];
 		function drawChart() {
 				
 		
@@ -26,7 +30,7 @@
     			url: '/api/' + window.location.pathname,
     			dataType: 'json'
   			}).done(function (results) {
-  				data = results;
+  				// data = results;
 				var lineChartData = {
 					// labels : ["January","February","March","April","May","June","July"],
 					labels : results.labels,
@@ -62,6 +66,8 @@
 					responsive: true
 					// ,scaleBeginAtZero : true
 					// ,bezierCurve: false
+					// ,showScale: false
+					// ,scaleShowLabels: false
 				});
 			});
 
